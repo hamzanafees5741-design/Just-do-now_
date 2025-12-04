@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background-color: #030303;
+  color: #e0f2fe;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* --- HYPER-REALISTIC ATMOSPHERE --- */
+
+/* Digital Noise Texture */
+.bg-noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Vignette Effect (Clean - No Side Neon) */
+.vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Simple dark vignette */
+  background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+#particles-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+/* Carbon Fiber Texture Utility */
+.bg-carbon {
+  background-image: 
+    linear-gradient(45deg, rgba(0,0,0,0.8) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.8)),
+    linear-gradient(45deg, rgba(0,0,0,0.8) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.8));
+  background-color: #050505;
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+/* Cyber Grid Animation */
+.cyber-grid {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: 
+    linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(500px) rotateX(60deg);
+  animation: grid-scroll 20s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+}
+
+@keyframes grid-scroll {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 60px;
+  }
+}
+
+/* 3D Glass Morphism Card */
+.holo-card-pro {
+  background: rgba(10, 10, 12, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(0, 243, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.holo-card-pro::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(125deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(0,243,255,0.05) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Holographic Shine */
+.holo-shine {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  transform: skewX(-25deg);
+  transition: 0.5s;
+  pointer-events: none;
+  z-index: 2;
+}
+.holo-card-pro:hover .holo-shine {
+  left: 200%;
+  transition: 1s ease-in-out;
+}
+
+/* CRT Scanline */
+.scanlines {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0) 50%,
+    rgba(0,0,0,0.1) 50%,
+    rgba(0,0,0,0.1)
+  );
+  background-size: 100% 4px;
+  position: fixed;
+  pointer-events: none;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 90;
+  opacity: 0.3;
+}
+
+/* Glitch Animation */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+.glitch-effect:hover {
+  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+  color: #ff00ff;
+  text-shadow: 2px 2px #00f3ff;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.3);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #0e7490;
+  border-radius: 2px;
+}
+
+.text-shadow-glow {
+  text-shadow: 0 0 10px rgba(34,211,238,0.8);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.screen-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* Splash Screen Loading Bar */
+@keyframes load-bar {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.animate-load-bar {
+  animation: load-bar 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

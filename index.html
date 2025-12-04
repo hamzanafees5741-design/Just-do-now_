@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Just Do Now</title>
+    
+    <!-- PWA / App Manifest Configuration -->
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="#030303" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Just Do Now" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Rajdhani', sans-serif;
+        background-color: #030303;
+        color: #e0f2fe;
+        overflow-x: hidden;
+        /* Disable pull-to-refresh on mobile for native feel */
+        overscroll-behavior-y: none;
+      }
+      h1, h2, h3, h4, h5, h6, .font-display {
+        font-family: 'Orbitron', sans-serif;
+      }
+      
+      /* --- HYPER-REALISTIC ATMOSPHERE --- */
+      
+      /* Digital Noise Texture */
+      .bg-noise {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
+        opacity: 0.07;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Vignette Effect (Helmet Look) */
+      .vignette {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.95) 100%);
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      #particles-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.6;
+      }
+
+      /* Carbon Fiber Texture Utility */
+      .bg-carbon {
+        background-image: 
+          linear-gradient(45deg, rgba(0,0,0,0.8) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.8)),
+          linear-gradient(45deg, rgba(0,0,0,0.8) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.8));
+        background-color: #050505;
+        background-size: 8px 8px;
+        background-position: 0 0, 4px 4px;
+      }
+
+      /* Cyber Grid Animation */
+      .cyber-grid {
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background-image: 
+          linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        transform: perspective(500px) rotateX(60deg);
+        animation: grid-scroll 20s linear infinite;
+        z-index: 0;
+        pointer-events: none;
+        mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+        -webkit-mask-image: radial-gradient(circle at center, black 0%, transparent 60%);
+      }
+
+      @keyframes grid-scroll {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 0 60px;
+        }
+      }
+
+      /* 3D Glass Morphism Card */
+      .holo-card-pro {
+        background: rgba(10, 10, 12, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 
+          0 10px 40px -10px rgba(0, 0, 0, 0.9),
+          0 0 0 1px rgba(0, 243, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+        transform-style: preserve-3d;
+      }
+      
+      .holo-card-pro::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(125deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(0,243,255,0.05) 100%);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Holographic Shine */
+      .holo-shine {
+        position: absolute;
+        top: 0; left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        transform: skewX(-25deg);
+        transition: 0.5s;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .holo-card-pro:hover .holo-shine {
+        left: 200%;
+        transition: 1s ease-in-out;
+      }
+
+      /* CRT Scanline */
+      .scanlines {
+        background: linear-gradient(
+          to bottom,
+          rgba(255,255,255,0),
+          rgba(255,255,255,0) 50%,
+          rgba(0,0,0,0.1) 50%,
+          rgba(0,0,0,0.1)
+        );
+        background-size: 100% 4px;
+        position: fixed;
+        pointer-events: none;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 90;
+        opacity: 0.3;
+      }
+      
+      /* Glitch Animation */
+      @keyframes glitch {
+        0% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+        100% { transform: translate(0); }
+      }
+      .glitch-effect:hover {
+        animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+        color: #ff00ff;
+        text-shadow: 2px 2px #00f3ff;
+      }
+
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.3);
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #0e7490;
+        border-radius: 2px;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <canvas id="particles-canvas"></canvas>
+    <script>
+      // Professional Particle System with Parallax
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      const particleCount = 70; 
+
+      // Mouse State for Parallax
+      let mouse = { x: 0, y: 0 };
+      
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        mouse.x = width / 2;
+        mouse.y = height / 2;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.init();
+        }
+
+        init() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.3; // Gentle ambient motion
+          this.vy = (Math.random() - 0.5) * 0.3;
+          this.size = Math.random() * 2 + 0.5;
+          this.baseAlpha = Math.random() * 0.5 + 0.1;
+          
+          // Parallax depth factor (0-1)
+          this.depth = Math.random() * 0.05; 
+          
+          // Color oscillation
+          this.hue = 180; // Start at Cyan
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < 0) this.x = width;
+          if (this.x > width) this.x = 0;
+          if (this.y < 0) this.y = height;
+          if (this.y > height) this.y = 0;
+          
+          // Dynamic Color Shift
+          this.hue = 180 + Math.sin(Date.now() * 0.001 + this.x * 0.01) * 30; // 150-210 range (Green-Cyan-Blue)
+        }
+
+        draw() {
+          // Calculate Parallax Offset
+          const dx = (mouse.x - width / 2) * this.depth;
+          const dy = (mouse.y - height / 2) * this.depth;
+          
+          const drawX = this.x + dx;
+          const drawY = this.y + dy;
+
+          ctx.beginPath();
+          ctx.arc(drawX, drawY, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.baseAlpha})`;
+          ctx.fill();
+          
+          return { x: drawX, y: drawY };
+        }
+      }
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Update and draw particles, storing their projected positions
+        const projected = particles.map(p => {
+            p.update();
+            return p.draw();
+        });
+        
+        // Draw Neural Connections
+        for (let i = 0; i < particleCount; i++) {
+          for (let j = i + 1; j < particleCount; j++) {
+            const p1 = projected[i];
+            const p2 = projected[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 120) {
+              const opacity = 1 - dist / 120;
+              ctx.beginPath();
+              ctx.strokeStyle = `hsla(${particles[i].hue}, 100%, 60%, ${opacity * 0.2})`;
+              ctx.lineWidth = 0.5;
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+
+      initParticles();
+      animate();
+    </script>
+  </body>
+</html>
