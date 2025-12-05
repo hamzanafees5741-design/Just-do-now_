@@ -21,7 +21,6 @@
         background-color: #030303;
         color: #e0f2fe;
         overflow-x: hidden;
-        /* Disable pull-to-refresh on mobile for native feel */
         overscroll-behavior-y: none;
       }
       h1, h2, h3, h4, h5, h6, .font-display {
@@ -29,8 +28,6 @@
       }
       
       /* --- HYPER-REALISTIC ATMOSPHERE --- */
-      
-      /* Digital Noise Texture */
       .bg-noise {
         position: fixed;
         top: 0;
@@ -43,7 +40,6 @@
         z-index: 0;
       }
 
-      /* Vignette Effect (Helmet Look) */
       .vignette {
         position: fixed;
         top: 0;
@@ -65,7 +61,6 @@
         opacity: 0.6;
       }
 
-      /* Carbon Fiber Texture Utility */
       .bg-carbon {
         background-image: 
           linear-gradient(45deg, rgba(0,0,0,0.8) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.8) 75%, rgba(0,0,0,0.8)),
@@ -75,7 +70,6 @@
         background-position: 0 0, 4px 4px;
       }
 
-      /* Cyber Grid Animation */
       .cyber-grid {
         position: fixed;
         top: -50%;
@@ -95,15 +89,10 @@
       }
 
       @keyframes grid-scroll {
-        0% {
-          background-position: 0 0;
-        }
-        100% {
-          background-position: 0 60px;
-        }
+        0% { background-position: 0 0; }
+        100% { background-position: 0 60px; }
       }
 
-      /* 3D Glass Morphism Card */
       .holo-card-pro {
         background: rgba(10, 10, 12, 0.7);
         backdrop-filter: blur(20px);
@@ -127,7 +116,6 @@
         z-index: 1;
       }
 
-      /* Holographic Shine */
       .holo-shine {
         position: absolute;
         top: 0; left: -100%;
@@ -144,7 +132,6 @@
         transition: 1s ease-in-out;
       }
 
-      /* CRT Scanline */
       .scanlines {
         background: linear-gradient(
           to bottom,
@@ -161,7 +148,6 @@
         opacity: 0.3;
       }
       
-      /* Glitch Animation */
       @keyframes glitch {
         0% { transform: translate(0); }
         20% { transform: translate(-2px, 2px); }
@@ -176,7 +162,6 @@
         text-shadow: 2px 2px #00f3ff;
       }
 
-      /* Custom Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
       }
@@ -196,7 +181,9 @@
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
     "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "vite": "https://aistudiocdn.com/vite@^7.2.6"
   }
 }
 </script>
@@ -205,14 +192,12 @@
     <div id="root"></div>
     <canvas id="particles-canvas"></canvas>
     <script>
-      // Professional Particle System with Parallax
       const canvas = document.getElementById('particles-canvas');
       const ctx = canvas.getContext('2d');
       let width, height;
       let particles = [];
       const particleCount = 70; 
 
-      // Mouse State for Parallax
       let mouse = { x: 0, y: 0 };
       
       window.addEventListener('mousemove', (e) => {
@@ -235,48 +220,34 @@
         constructor() {
           this.init();
         }
-
         init() {
           this.x = Math.random() * width;
           this.y = Math.random() * height;
-          this.vx = (Math.random() - 0.5) * 0.3; // Gentle ambient motion
+          this.vx = (Math.random() - 0.5) * 0.3; 
           this.vy = (Math.random() - 0.5) * 0.3;
           this.size = Math.random() * 2 + 0.5;
           this.baseAlpha = Math.random() * 0.5 + 0.1;
-          
-          // Parallax depth factor (0-1)
           this.depth = Math.random() * 0.05; 
-          
-          // Color oscillation
-          this.hue = 180; // Start at Cyan
+          this.hue = 180; 
         }
-
         update() {
           this.x += this.vx;
           this.y += this.vy;
-
           if (this.x < 0) this.x = width;
           if (this.x > width) this.x = 0;
           if (this.y < 0) this.y = height;
           if (this.y > height) this.y = 0;
-          
-          // Dynamic Color Shift
-          this.hue = 180 + Math.sin(Date.now() * 0.001 + this.x * 0.01) * 30; // 150-210 range (Green-Cyan-Blue)
+          this.hue = 180 + Math.sin(Date.now() * 0.001 + this.x * 0.01) * 30; 
         }
-
         draw() {
-          // Calculate Parallax Offset
           const dx = (mouse.x - width / 2) * this.depth;
           const dy = (mouse.y - height / 2) * this.depth;
-          
           const drawX = this.x + dx;
           const drawY = this.y + dy;
-
           ctx.beginPath();
           ctx.arc(drawX, drawY, this.size, 0, Math.PI * 2);
           ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.baseAlpha})`;
           ctx.fill();
-          
           return { x: drawX, y: drawY };
         }
       }
@@ -290,14 +261,10 @@
 
       function animate() {
         ctx.clearRect(0, 0, width, height);
-        
-        // Update and draw particles, storing their projected positions
         const projected = particles.map(p => {
             p.update();
             return p.draw();
         });
-        
-        // Draw Neural Connections
         for (let i = 0; i < particleCount; i++) {
           for (let j = i + 1; j < particleCount; j++) {
             const p1 = projected[i];
@@ -305,7 +272,6 @@
             const dx = p1.x - p2.x;
             const dy = p1.y - p2.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-
             if (dist < 120) {
               const opacity = 1 - dist / 120;
               ctx.beginPath();
@@ -319,9 +285,24 @@
         }
         requestAnimationFrame(animate);
       }
-
       initParticles();
       animate();
     </script>
+    <script>
+      // Service Worker Registration for PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          // When built, sw.js moves from 'public/' to root './'
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
