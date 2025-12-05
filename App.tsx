@@ -38,14 +38,14 @@ function App() {
   const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
-    // Splash Screen Timer
+    // Splash Screen Timer - Optimized for speed (2 seconds total)
     const fadeTimer = setTimeout(() => {
         setIsFading(true);
-    }, 2200);
+    }, 1500);
 
     const removeTimer = setTimeout(() => {
         setShowSplash(false);
-    }, 2800);
+    }, 2000);
 
     return () => {
         clearTimeout(fadeTimer);
@@ -53,36 +53,43 @@ function App() {
     };
   }, []);
 
-  // Load from storage
+  // Load from storage with Safety Check (Try-Catch)
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const storedXp = localStorage.getItem(XP_KEY);
-    const storedCredits = localStorage.getItem(CREDITS_KEY);
-    const storedInventory = localStorage.getItem(INVENTORY_KEY);
-    const storedAttributes = localStorage.getItem(ATTRIBUTES_KEY);
-    const storedAudio = localStorage.getItem(AUDIO_PREF_KEY);
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const storedXp = localStorage.getItem(XP_KEY);
+      const storedCredits = localStorage.getItem(CREDITS_KEY);
+      const storedInventory = localStorage.getItem(INVENTORY_KEY);
+      const storedAttributes = localStorage.getItem(ATTRIBUTES_KEY);
+      const storedAudio = localStorage.getItem(AUDIO_PREF_KEY);
 
-    let parsedHabits: Habit[] = [];
-    if (stored) {
-      parsedHabits = JSON.parse(stored);
-      setHabits(parsedHabits);
-    }
-    
-    if (storedXp) setXp(parseInt(storedXp));
-    if (storedCredits) setCredits(parseInt(storedCredits));
-    if (storedInventory) setInventory(JSON.parse(storedInventory));
-    if (storedAudio) setIsAudioEnabled(JSON.parse(storedAudio));
-    
-    if (storedAttributes) {
-       const attrs = JSON.parse(storedAttributes);
-       const totalCompletions = parsedHabits.reduce((acc: number, h: Habit) => acc + Object.keys(h.logs).length, 0);
-       if (totalCompletions === 0 && attrs.vitality === 20) {
-          setAttributes({ vitality: 0, intellect: 0, willpower: 0, tech: 0, charisma: 0 });
-       } else {
-          setAttributes(attrs);
-       }
-    } else {
-       setAttributes({ vitality: 0, intellect: 0, willpower: 0, tech: 0, charisma: 0 });
+      let parsedHabits: Habit[] = [];
+      if (stored) {
+        parsedHabits = JSON.parse(stored);
+        setHabits(parsedHabits);
+      }
+      
+      if (storedXp) setXp(parseInt(storedXp));
+      if (storedCredits) setCredits(parseInt(storedCredits));
+      if (storedInventory) setInventory(JSON.parse(storedInventory));
+      if (storedAudio) setIsAudioEnabled(JSON.parse(storedAudio));
+      
+      if (storedAttributes) {
+         const attrs = JSON.parse(storedAttributes);
+         const totalCompletions = parsedHabits.reduce((acc: number, h: Habit) => acc + Object.keys(h.logs).length, 0);
+         // Reset legacy attributes logic
+         if (totalCompletions === 0 && attrs.vitality === 20) {
+            setAttributes({ vitality: 0, intellect: 0, willpower: 0, tech: 0, charisma: 0 });
+         } else {
+            setAttributes(attrs);
+         }
+      } else {
+         setAttributes({ vitality: 0, intellect: 0, willpower: 0, tech: 0, charisma: 0 });
+      }
+    } catch (error) {
+      console.error("Data load error:", error);
+      // If error occurs, we gracefully continue with defaults so app doesn't freeze
+      setShowSplash(false); 
     }
   }, []);
 
@@ -244,13 +251,13 @@ function App() {
       
       {/* --- SPLASH SCREEN --- */}
       {showSplash && (
-        <div className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030303] transition-opacity duration-700 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+        <div className={`fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#030303] transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
             {/* Background Atmosphere */}
             <div className="bg-carbon absolute inset-0 z-0"></div>
             {/* Reusing Vignette for Neon Edge Consistency */}
             <div className="absolute inset-0 z-10 vignette"></div>
             
-            <div className="relative z-20 flex flex-col items-center">
+            <div className="relative z-20 flex flex-col items-center px-6">
                 {/* Logo Icon */}
                 <div className="relative mb-6">
                     <div className="absolute inset-0 bg-cyan-500 blur-2xl opacity-30 animate-pulse"></div>
@@ -258,8 +265,8 @@ function App() {
                     <div className="absolute inset-0 border border-cyan-500/30 rounded-full scale-150 animate-ping opacity-20"></div>
                 </div>
                 
-                {/* Text */}
-                <h1 className="text-4xl md:text-5xl font-black font-display tracking-[0.2em] text-white glitch-effect drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">
+                {/* Text - Fixed Alignment: text-center, reduced tracking on mobile */}
+                <h1 className="text-3xl md:text-5xl font-black font-display tracking-[0.1em] md:tracking-[0.2em] text-white text-center leading-tight glitch-effect drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">
                     JUST DO NOW
                 </h1>
                 
@@ -268,7 +275,7 @@ function App() {
                     <div className="h-full bg-cyan-400 shadow-[0_0_10px_#22d3ee] animate-load-bar"></div>
                 </div>
                 <p className="mt-4 text-[10px] font-mono text-cyan-600 uppercase tracking-widest animate-pulse">
-                    ESTABLISHING CONNECTION...
+                    SYSTEM INITIALIZED
                 </p>
             </div>
         </div>

@@ -1,9 +1,6 @@
 {
   "short_name": "JustDoNow",
   "name": "Just Do Now - Cyberpunk Tracker",
-  "description": "A cyberpunk-styled habit tracker with neon aesthetics and AI-powered coaching.",
-  "categories": ["productivity", "lifestyle", "utilities"],
-  "id": "/?source=pwa",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",

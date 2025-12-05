@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Habit } from '../types';
-import { Trash2, Play, Clock, Inbox, Edit, X, Save, RotateCcw } from 'lucide-react';
-import { NeonToggle, StructuredIcon, NeonChargeButton, NeonSlider, NeonButton } from './NeonComponents';
+import { Trash2, Play, Clock, Inbox, Edit, X, Save, RotateCcw, AlertTriangle, ChevronRight, Check } from 'lucide-react';
+import { NeonToggle, ConsoleRow, NeonChargeButton, NeonSlider, NeonButton } from './NeonComponents';
 
 interface HabitListProps {
   habits: Habit[];
@@ -15,14 +15,13 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggle, onDelete, onFoc
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [ratingHabitId, setRatingHabitId] = useState<string | null>(null);
   const [efficiencyRating, setEfficiencyRating] = useState(100);
-  const [showAll, setShowAll] = useState(false); // false = Today (Timeline), true = All (List)
+  const [showAll, setShowAll] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null); 
   
   const todayDate = new Date();
   const todayStr = todayDate.toISOString().split('T')[0];
   const currentDayIndex = todayDate.getDay(); 
 
-  // --- Filtering Logic ---
   const inboxHabits = habits.filter(h => 
     !h.reminderTime && 
     (h.frequencyDays.includes(currentDayIndex) || h.logs[todayStr]) &&
@@ -37,23 +36,13 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggle, onDelete, onFoc
 
   const allHabits = habits;
 
-  // Sort timeline habits by time
   timelineHabits.sort((a, b) => (a.reminderTime || '').localeCompare(b.reminderTime || ''));
 
-  const calculateEndTime = (startTime: string, durationMinutes: number = 30) => {
-    const [hours, mins] = startTime.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, mins + durationMinutes);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  };
-
   const handleInitialToggle = (id: string) => {
-    // If habit is already completed today, just toggle it off directly.
     const habit = habits.find(h => h.id === id);
     if (habit && habit.logs[todayStr]) {
        onToggle(id);
     } else {
-       // If completing, open the efficiency rater
        setRatingHabitId(id);
        setEfficiencyRating(100);
     }
@@ -63,91 +52,64 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggle, onDelete, onFoc
     if (ratingHabitId) {
        onToggle(ratingHabitId, efficiencyRating);
        setRatingHabitId(null);
-       
-       // Trigger screen shake via DOM manually for visceral feedback
-       document.body.classList.add('screen-shake');
-       setTimeout(() => {
-         document.body.classList.remove('screen-shake');
-       }, 500);
     }
   };
 
-  const renderHabitCard = (habit: Habit, isTimelineItem: boolean = false) => {
+  const renderHabitRow = (habit: Habit, isTimelineItem: boolean = false) => {
     const log = habit.logs[todayStr];
     const isCompleted = !!log;
     const isExpanded = expandedId === habit.id;
     
     return (
-      <div 
-        key={habit.id}
-        className={`group relative transition-all duration-300 ${
-          isTimelineItem ? 'ml-8 mb-6' : 'mb-3'
-        }`}
-      >
-        {/* Timeline Connector Laser */}
-        {isTimelineItem && (
-          <div className="absolute -left-8 top-7 w-8 flex items-center">
-             <div className="h-[1px] w-full bg-cyan-900/50 group-hover:bg-cyan-500 transition-colors"></div>
-             <div className="w-2 h-2 rounded-sm bg-[#050505] border border-cyan-500 shadow-[0_0_10px_#00f3ff] -ml-1 z-10 relative rotate-45"></div>
-          </div>
-        )}
-
-        <div 
+      <div key={habit.id} className="mb-2 group">
+        <ConsoleRow 
           onClick={() => {
             setExpandedId(isExpanded ? null : habit.id);
             setDeleteConfirmId(null); 
           }}
-          className={`
-            relative p-4 rounded-xl cursor-pointer overflow-hidden transition-all duration-300
-            border
-            ${isCompleted 
-              ? 'bg-black/20 border-white/5 opacity-60 grayscale-[0.8]' 
-              : 'holo-card-pro hover:scale-[1.01]'
-            }
-          `}
+          className={`relative overflow-hidden ${isCompleted ? 'opacity-60' : ''}`}
         >
-           {/* Cyber Corner Decals */}
-           {!isCompleted && (
-              <>
-               <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-500/50"></div>
-               <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-500/50"></div>
-              </>
-           )}
+           {/* Active Indicator Line (Left) */}
+           {!isCompleted && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-600 rounded-l-lg"></div>}
+           
+           <div className="flex items-center justify-between p-4 h-16">
+              <div className="flex items-center gap-3 pl-2">
+                 <div className={`transition-transform duration-200 ${isExpanded ? 'rotate-90 text-white' : 'text-gray-600'}`}>
+                    <ChevronRight size={16} />
+                 </div>
 
-           <div className="relative flex items-center justify-between z-10">
-              <div className="flex items-center gap-4">
-                 <StructuredIcon icon={habit.icon} size={20} className={isCompleted ? 'grayscale opacity-50' : ''} />
-                 
                  <div>
-                    <div className="flex items-center gap-2">
-                        <h3 className={`font-display text-sm font-bold tracking-widest uppercase transition-colors ${isCompleted ? 'text-gray-600 line-through decoration-gray-700' : 'text-gray-100 group-hover:text-neon-blue'}`}>
-                        {habit.title}
-                        </h3>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 mt-1.5">
-                      {habit.duration && !isCompleted && (
-                        <span className="text-[9px] font-mono text-cyan-400 bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-900/50">
-                          {habit.duration}m
-                        </span>
-                      )}
-                      {habit.reminderTime && !isTimelineItem && (
-                        <span className="text-[9px] text-gray-500 flex items-center gap-1 font-mono">
-                          <Clock size={10} /> {habit.reminderTime}
-                        </span>
-                      )}
-                      
-                      {/* Efficiency Badge */}
-                      {isCompleted && log.efficiency !== undefined && (
-                        <span className="text-[9px] font-mono font-bold text-green-400 border border-green-500/30 px-1 rounded">
-                           EFF: {log.efficiency}%
-                        </span>
-                      )}
-                    </div>
+                    <h3 className={`font-mono text-sm font-medium tracking-wide ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-200'}`}>
+                       {habit.title}
+                    </h3>
+                    {habit.reminderTime && (
+                         <span className="text-[10px] text-gray-600 font-mono block mt-0.5">
+                           {habit.reminderTime}
+                         </span>
+                    )}
                  </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
+                  {/* Status Badges similar to screenshot "Alert 2" */}
+                  {!isCompleted && (
+                      <div className="flex items-center gap-3">
+                         {habit.streak > 0 && (
+                            <div className="flex items-center gap-1.5 px-2 py-1 bg-[#1a1a1a] border border-white/10 rounded-full">
+                                <span className="text-orange-500">
+                                   <AlertTriangle size={10} fill="currentColor" />
+                                </span>
+                                <span className="text-[10px] font-mono font-bold text-gray-400">{habit.streak}</span>
+                            </div>
+                         )}
+                         
+                         {habit.duration && (
+                            <span className="text-gray-500 font-mono text-xs">{habit.duration}m</span>
+                         )}
+                      </div>
+                  )}
+
+                  {/* Completion Circle - Blue Check Style */}
                   <NeonChargeButton 
                     completed={isCompleted} 
                     onComplete={() => handleInitialToggle(habit.id)} 
@@ -155,38 +117,29 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggle, onDelete, onFoc
               </div>
            </div>
 
-           {/* Expanded Controls - Cyber Panel */}
+           {/* Expanded Detail Panel */}
            {isExpanded && (
-             <div className="mt-4 pt-4 border-t border-white/5 animate-fade-in cursor-default" onClick={(e) => e.stopPropagation()}>
-                
-                <div className="flex justify-between items-center">
+             <div className="px-4 pb-4 pt-0 border-t border-white/5 bg-[#0e0e0e]" onClick={(e) => e.stopPropagation()}>
+                <div className="flex justify-between items-center pt-3">
                     <div className="flex gap-2">
-                    {!isCompleted && (
-                        <button 
-                            onClick={(e) => { e.stopPropagation(); onFocus(habit); }}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold uppercase tracking-wider hover:bg-cyan-500/20 hover:shadow-[0_0_15px_rgba(0,243,255,0.2)] transition-all"
-                        >
-                            <Play size={10} fill="currentColor" /> Start Focus
-                        </button>
-                    )}
-                    {isCompleted && (
-                        <button 
-                        onClick={(e) => { e.stopPropagation(); onToggle(habit.id); }}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider hover:bg-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all"
-                        >
-                        <RotateCcw size={10} /> Reset Status
-                        </button>
-                    )}
+                        {!isCompleted && (
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); onFocus(habit); }}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-cyan-400 text-[10px] font-bold uppercase tracking-wider transition-all border border-transparent hover:border-white/10"
+                            >
+                                <Play size={10} fill="currentColor" /> Start Focus
+                            </button>
+                        )}
                     </div>
-                    <div className="flex gap-4 items-center">
+                    
+                    <div className="flex gap-2 items-center">
                         <button 
                             onClick={(e) => { e.stopPropagation(); onEdit(habit); }}
-                            className="text-gray-500 hover:text-cyan-400 text-[10px] font-bold uppercase transition-colors flex items-center gap-1"
+                            className="text-gray-500 hover:text-white px-3 py-1.5 text-[10px] font-bold uppercase"
                         >
-                            <Edit size={10} /> Edit
+                            Edit
                         </button>
                         
-                        {/* 2-Step Delete Button */}
                         <button 
                             onClick={(e) => { 
                                 e.stopPropagation(); 
@@ -194,108 +147,91 @@ const HabitList: React.FC<HabitListProps> = ({ habits, onToggle, onDelete, onFoc
                                     onDelete(habit.id);
                                 } else {
                                     setDeleteConfirmId(habit.id);
-                                    // Reset confirmation after 3 seconds
                                     setTimeout(() => setDeleteConfirmId(null), 3000);
                                 }
                             }}
-                            className={`text-[10px] font-bold uppercase transition-all flex items-center gap-1 px-2 py-1 rounded 
+                            className={`text-[10px] font-bold uppercase transition-all px-3 py-1.5 rounded-md 
                                 ${deleteConfirmId === habit.id 
-                                    ? 'bg-red-500 text-white animate-pulse shadow-[0_0_10px_red]' 
-                                    : 'text-gray-500 hover:text-red-500'
+                                    ? 'bg-red-900/50 text-red-200 border border-red-800' 
+                                    : 'text-gray-500 hover:text-red-400'
                                 }`}
                         >
-                            <Trash2 size={10} /> {deleteConfirmId === habit.id ? 'CONFIRM?' : 'Delete'}
+                            {deleteConfirmId === habit.id ? 'Confirm?' : 'Delete'}
                         </button>
                     </div>
                 </div>
              </div>
            )}
-        </div>
-        
-        {/* Timeline Time Label */}
-        {isTimelineItem && (
-          <div className="absolute -left-20 top-5 w-12 text-right">
-             <span className="block text-sm font-display font-bold text-gray-400 tracking-wider">{habit.reminderTime}</span>
-             {habit.duration && (
-               <span className="block text-[9px] text-gray-600 font-mono">{calculateEndTime(habit.reminderTime!, habit.duration)}</span>
-             )}
-          </div>
-        )}
+        </ConsoleRow>
       </div>
     );
   };
 
   if (habits.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 opacity-60">
-        <div className="w-24 h-24 rounded-full border border-dashed border-gray-800 flex items-center justify-center mb-6 relative">
-           <div className="absolute inset-0 bg-cyan-500/5 rounded-full blur-xl"></div>
-           <Inbox size={32} className="text-gray-700 relative z-10" />
-        </div>
-        <p className="text-cyan-600 font-display tracking-[0.3em] text-sm mb-2 glitch-effect">NO DATA</p>
-        <p className="text-[10px] text-gray-600 font-mono uppercase">No habits found.</p>
+      <div className="flex flex-col items-center justify-center py-32 opacity-50">
+        <Inbox size={48} className="text-gray-800 mb-4" />
+        <p className="text-gray-600 font-mono text-xs uppercase tracking-widest">No logs found.</p>
       </div>
     );
   }
 
   return (
     <div className="pb-32">
-       {/* Efficiency Rating Modal Overlay */}
+       {/* Efficiency Rating Modal */}
        {ratingHabitId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 animate-fade-in">
-             <div className="w-full max-w-sm holo-card-pro p-6 rounded-2xl relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6 animate-fade-in">
+             <div className="w-full max-w-sm bg-[#111] border border-white/10 p-6 rounded-xl relative shadow-2xl">
                 <button onClick={() => setRatingHabitId(null)} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20}/></button>
                 
-                <h3 className="text-xl font-display font-bold text-white mb-2">Protocol Report</h3>
-                <p className="text-gray-400 text-xs font-mono mb-6">Rate your execution efficiency.</p>
+                <h3 className="text-lg font-mono font-bold text-white mb-1">Log Efficiency</h3>
+                <p className="text-gray-500 text-xs font-mono mb-6">Rate your performance session.</p>
                 
                 <div className="mb-8">
                    <NeonSlider value={efficiencyRating} onChange={setEfficiencyRating} />
                 </div>
                 
                 <NeonButton onClick={confirmCompletion} className="w-full">
-                   <Save size={16} /> Confirm Data
+                   <Check size={16} /> Commit Log
                 </NeonButton>
              </div>
           </div>
        )}
 
-      <NeonToggle 
-        value={showAll} 
-        onChange={setShowAll} 
-        leftLabel="TIMELINE" 
-        rightLabel="ALL HABITS" 
-      />
-
-      {showAll ? (
-        <div className="space-y-3">
-          {allHabits.map(habit => renderHabitCard(habit))}
+      <div className="flex justify-center mb-6">
+        <div className="w-full max-w-xs">
+            <NeonToggle 
+                value={showAll} 
+                onChange={setShowAll} 
+                leftLabel="TODAY'S LOGS" 
+                rightLabel="ALL PROTOCOLS" 
+            />
         </div>
-      ) : (
-        <div className="relative pl-4">
-           {inboxHabits.length > 0 && (
-             <div className="mb-12 animate-fade-in">
-               <div className="flex items-center gap-2 mb-4 opacity-50">
-                 <div className="h-[1px] w-4 bg-cyan-500"></div>
-                 <span className="text-[10px] font-bold text-cyan-500 uppercase tracking-[0.3em] font-display">Today's Tasks</span>
-               </div>
-               {inboxHabits.map(habit => renderHabitCard(habit))}
-             </div>
-           )}
+      </div>
 
-           {timelineHabits.length > 0 ? (
-             <div className="relative border-l border-dashed border-cyan-900/30 ml-3 pt-4 pb-10">
-                {timelineHabits.map(habit => renderHabitCard(habit, true))}
-             </div>
-           ) : (
-             inboxHabits.length === 0 && (
-               <div className="text-center py-10 border border-white/5 rounded-2xl bg-black/20">
-                  <p className="text-gray-600 font-mono text-xs tracking-widest">NO TASKS SCHEDULED</p>
-               </div>
-             )
-           )}
-        </div>
-      )}
+      <div className="space-y-1">
+        {showAll ? (
+          allHabits.map(habit => renderHabitRow(habit))
+        ) : (
+          <>
+            {inboxHabits.map(habit => renderHabitRow(habit))}
+            {timelineHabits.length > 0 && (
+                <div className="mt-8">
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                         <Clock size={12} className="text-gray-600" />
+                         <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Scheduled</span>
+                    </div>
+                    {timelineHabits.map(habit => renderHabitRow(habit, true))}
+                </div>
+            )}
+            {inboxHabits.length === 0 && timelineHabits.length === 0 && (
+                <div className="text-center py-12 border border-dashed border-white/10 rounded-xl">
+                   <p className="text-gray-600 font-mono text-xs">All systems nominal. No pending tasks.</p>
+                </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
